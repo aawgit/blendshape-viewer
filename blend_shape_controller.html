@@ -90,7 +90,7 @@
         function createSliders(dict) {
             const container = document.getElementById('sliderContainer');
             Object.entries(dict).forEach(([name, index], i) => {
-                if (i >= 52) return;
+                // if (i >= 52) return;
                 const group = document.createElement('div');
                 group.className = 'slider-group';
 
@@ -115,26 +115,29 @@
         }
 
         const loader = new GLTFLoader();
-        loader.load('./face.glb', (gltf) => {
+        loader.load('./kelly_-_woman_head_with_blendshapes.glb', (gltf) => {
             const model = gltf.scene;
             scene.add(model);
-            model.rotation.y = Math.PI;
+            // model.rotation.y = Math.PI;
 
             model.traverse((child) => {
                 if (child.isMesh && child.morphTargetInfluences) {
                     console.log("Found mesh with morph targets:", child.name);
                     // You can log to inspect and optionally choose by name
-                    if (!meshWithMorphs && child.morphTargetInfluences && child.name === "Facebaked_custom_8") meshWithMorphs = child;
+                    if (!meshWithMorphs && child.morphTargetInfluences ) {
+                        meshWithMorphs = child;
+                        createSliders(meshWithMorphs.morphTargetDictionary);
+                    }
                 }
             });
 
 
             if (meshWithMorphs) {
-                createSliders(meshWithMorphs.morphTargetDictionary);
+                // createSliders(meshWithMorphs.morphTargetDictionary);
 
                 // Example: apply sample input blendshape coefficients
-                const testInput = new Array(100).fill(1);
-                testInput[79] = 1; 
+                const testInput = new Array(100).fill(0);
+                testInput[67] = 1; 
                 // testInput[69 - 17] = 1; // Example: eyeBlinkLeft
                 applyBlendshapeCoefficients(testInput);
             }
