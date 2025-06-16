@@ -1,5 +1,6 @@
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { FBXLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/FBXLoader.js';
+import { blendshapeNameMap, arkitBlendshapeOrder } from './constants.js'
 
 // ARKit 52 standard blendshapes in order
 const arkitBlendshapes = [
@@ -22,26 +23,18 @@ let sliders = {};
 let currentBlendshapeValues = new Array(52).fill(0);
 
 function initThreeJS() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a1a);
-    
-    camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0.5, 3);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    const container = document.getElementById('threejs-container');
-    const rect = container.getBoundingClientRect();
-    renderer.setSize(rect.width, rect.height);
-    container.appendChild(renderer.domElement);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    // Lighting
     scene.add(new THREE.AmbientLight(0x888888));
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
     dirLight.position.set(1, 2, 3);
     scene.add(dirLight);
-
-    // Handle resize
-    window.addEventListener('resize', onWindowResize);
     
     // Load model (you'll need to provide the correct path)
     loadModel();
