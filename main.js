@@ -17,24 +17,35 @@ const arkitBlendshapes = [
     'tongueOut'
 ];
 
+let pendingBlendshapeValues = null;
+
+
 // Three.js setup
 let scene, camera, renderer, morphMeshes = [];
 let sliders = {};
 let currentBlendshapeValues = new Array(52).fill(0);
 
 function initThreeJS() {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1a1a);
+    
+    camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
     camera.position.set(0, 0.5, 3);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    const container = document.getElementById('threejs-container');
+    const rect = container.getBoundingClientRect();
+    renderer.setSize(rect.width, rect.height);
+    container.appendChild(renderer.domElement);
 
+    // Lighting
     scene.add(new THREE.AmbientLight(0x888888));
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
     dirLight.position.set(1, 2, 3);
     scene.add(dirLight);
+
+    // Handle resize
+    window.addEventListener('resize', onWindowResize);
     
     // Load model (you'll need to provide the correct path)
     loadModel();
@@ -69,91 +80,67 @@ function loadModel() {
 
 function createSlidersForMesh(mesh) {
     const container = document.getElementById("sliderContainer");
+
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "mesh-group";
+
+    const title = document.createElement("h3");
+    title.innerText = mesh.name || "Unnamed Mesh";
+    groupDiv.appendChild(title);
+
     const dict = mesh.morphTargetDictionary || {};
     const influences = mesh.morphTargetInfluences || [];
 
-    // Simple name mapping (you might need to adjust this based on your model)
-    const blendshapeNameMap = {};
-    Object.keys(dict).forEach(key => {
-        const lowerKey = key.toLowerCase();
-        for (let i = 0; i < arkitBlendshapes.length; i++) {
-            if (lowerKey.includes(arkitBlendshapes[i].toLowerCase())) {
-                blendshapeNameMap[key] = arkitBlendshapes[i];
-                break;
-            }
-        }
-    });
-
+    // Reverse lookup: ARKit name -> modelName
     const modelNameByArkit = {};
     for (const [modelName, index] of Object.entries(dict)) {
-        const arkitName = blendshapeNameMap[modelName];
-        if (arkitName) {
-            const arkitIndex = arkitBlendshapes.indexOf(arkitName);
-            if (arkitIndex !== -1) {
-                modelNameByArkit[arkitIndex] = { modelName, index };
-            }
-        }
+      const arkitName = blendshapeNameMap[modelName];
+      if (arkitName) {
+        modelNameByArkit[arkitName] = { modelName, index };
+      }
     }
 
-    for (let i = 0; i < arkitBlendshapes.length; i++) {
-        const arkitName = arkitBlendshapes[i];
-        const mapping = modelNameByArkit[i];
+    // Create sliders in fixed order
+    for (let i = 0; i < arkitBlendshapeOrder.length; i++) {
+      const arkitName = arkitBlendshapeOrder[i];
+      const mapping = modelNameByArkit[arkitName];
 
-        const sliderGroup = document.createElement("div");
-        sliderGroup.className = "slider-group";
-        sliderGroup.id = `slider-group-${i}`;
+      const sliderGroup = document.createElement("div");
+      sliderGroup.className = "slider-group";
 
-        const label = document.createElement("label");
-        label.textContent = `${i} ${arkitName}`;
-        sliderGroup.appendChild(label);
+      const label = document.createElement("label");
+      label.textContent = `${i} ${arkitName}`;
+      sliderGroup.appendChild(label);
 
-        const sliderContainer = document.createElement("div");
-        sliderContainer.className = "slider-container";
+      const slider = document.createElement("input");
+      slider.type = "range";
+      slider.min = 0;
+      slider.max = 1;
+      slider.step = 0.01;
 
-        const slider = document.createElement("input");
-        slider.type = "range";
-        slider.min = 0;
-        slider.max = 1;
-        slider.step = 0.01;
-        slider.id = `slider-${i}`;
+      if (mapping) {
+        // Real blendshape
+        slider.value = influences[mapping.index] || 0;
+        slider.oninput = () => {
+          influences[mapping.index] = parseFloat(slider.value);
+        };
+      } else {
+        // Placeholder
+        slider.value = 0;
+        slider.disabled = true;
+      }
 
-        const valueDisplay = document.createElement("span");
-        valueDisplay.className = "slider-value";
-        valueDisplay.id = `value-${i}`;
-
-        if (mapping) {
-            slider.value = influences[mapping.index] || 0;
-            valueDisplay.textContent = slider.value;
-            slider.oninput = () => {
-                const value = parseFloat(slider.value);
-                valueDisplay.textContent = value.toFixed(2);
-                currentBlendshapeValues[i] = value;
-                updateSliderGroupState(sliderGroup, value);
-            
-                morphMeshes.forEach(mesh => {
-                    if (mesh.morphTargetInfluences && sliders[i].mapping) {
-                        const targetIndex = mesh.morphTargetDictionary[sliders[i].mapping.modelName];
-                        if (targetIndex !== undefined) {
-                            mesh.morphTargetInfluences[targetIndex] = value;
-                        }
-                    }
-                });
-            };
-            
-        } else {
-            slider.value = 0;
-            slider.disabled = true;
-            valueDisplay.textContent = "N/A";
-        }
-
-        sliderContainer.appendChild(slider);
-        sliderContainer.appendChild(valueDisplay);
-        sliderGroup.appendChild(sliderContainer);
-        container.appendChild(sliderGroup);
-        
-        sliders[i] = { slider, valueDisplay, sliderGroup, mapping };
+      sliderGroup.appendChild(slider);
+      groupDiv.appendChild(sliderGroup);
     }
-}
+
+    container.appendChild(groupDiv);
+    if (pendingBlendshapeValues) {
+        applyBlendshapeValues(pendingBlendshapeValues);
+        pendingBlendshapeValues = null;
+    }
+    
+  }
 
 function updateSliderGroupState(sliderGroup, value) {
     if (Math.abs(value) > 0.01) {
@@ -201,14 +188,14 @@ function setupModelControls() {
 }
 
 // Parse data function
-window.parseData = function() {
+window.parseData = function () {
     const input = document.getElementById('inputData').value.trim();
-    
+
     if (!input) {
         alert('Please paste your NeuroSync response array');
         return;
     }
-    
+
     try {
         let values;
         if (input.startsWith('[') && input.endsWith(']')) {
@@ -216,18 +203,22 @@ window.parseData = function() {
         } else {
             values = input.split(',').map(v => parseFloat(v.trim()));
         }
-        
+
         if (!Array.isArray(values)) {
             throw new Error('Invalid array format');
         }
-        
-        applyBlendshapeValues(values);
+
+        if (Object.keys(sliders).length === 0) {
+            pendingBlendshapeValues = values;  // Save until model is ready
+        } else {
+            applyBlendshapeValues(values);
+        }
         displayResults(values);
-        
     } catch (error) {
         alert('Error parsing data: ' + error.message);
     }
 };
+
 
 function applyBlendshapeValues(values) {
     for (let i = 0; i < Math.min(values.length, arkitBlendshapes.length); i++) {
@@ -269,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModelControls();
     
     // Parse example data on load
-    // const exampleData = `[0.0, 0.0, 0.0, 0.0, 0.0, 0.026174580678343773, 0.594277560710907, 0.0, 0.0, 0.0, 0.0, 0.0, 0.026059681549668312, 0.5944592952728271, 0.023094596341252327, 0.0006808243924751878, 0.024826038628816605, 0.046770986169576645, 0.0009422543807886541, 0.06569699943065643, 0.00044532548054121435, 0.019521566107869148, -3.756374280783348e-05, 0.12610526382923126, 0.09840516000986099, -0.00028435199055820704, 0.0003598964831326157, 0.03203817084431648, 0.02757873758673668, 0.11394623667001724, 0.11269740760326385, 0.006579927634447813, 0.009613755159080029, 0.00030736744520254433, 0.0003520186000969261, 6.487023347290233e-05, 0.0011935947695747018, 0.23282714188098907, 0.22038716077804565, 0.04937620460987091, 0.043106041848659515, -0.00029014566098339856, -0.0003475777921266854, 0.2671084403991699, 0.134125217795372, 0.13437339663505554, 0.00018445044406689703, 0.04482872411608696, 0.04833042994141579, 0.000261367968050763, -0.00020279570890124887, 0.0]`;
-    // document.getElementById('inputData').value = exampleData;
-    // parseData();
+    const exampleData = `[0.0, 0.0, 0.0, 0.0, 0.0, 0.026174580678343773, 0.594277560710907, 0.0, 0.0, 0.0, 0.0, 0.0, 0.026059681549668312, 0.5944592952728271, 0.023094596341252327, 0.0006808243924751878, 0.024826038628816605, 0.046770986169576645, 0.0009422543807886541, 0.06569699943065643, 0.00044532548054121435, 0.019521566107869148, -3.756374280783348e-05, 0.12610526382923126, 0.09840516000986099, -0.00028435199055820704, 0.0003598964831326157, 0.03203817084431648, 0.02757873758673668, 0.11394623667001724, 0.11269740760326385, 0.006579927634447813, 0.009613755159080029, 0.00030736744520254433, 0.0003520186000969261, 6.487023347290233e-05, 0.0011935947695747018, 0.23282714188098907, 0.22038716077804565, 0.04937620460987091, 0.043106041848659515, -0.00029014566098339856, -0.0003475777921266854, 0.2671084403991699, 0.134125217795372, 0.13437339663505554, 0.00018445044406689703, 0.04482872411608696, 0.04833042994141579, 0.000261367968050763, -0.00020279570890124887, 0.0]`;
+    document.getElementById('inputData').value = exampleData;
+    parseData();
 });
