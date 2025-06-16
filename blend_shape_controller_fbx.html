@@ -1,28 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>FBX Multi-Mesh Blendshape Controller</title>
   <style>
-    body { margin: 0; overflow: hidden; background: #111; color: white; font-family: sans-serif; }
-    canvas { display: block; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    canvas {
+      display: block;
+    }
+
     #sliderContainer {
-      position: fixed; top: 10px; right: 10px;
-      max-height: 90vh; overflow-y: auto;
-      background: #222; padding: 10px; border-radius: 8px;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
       font-size: 13px;
     }
-    .mesh-group { margin-bottom: 1em; }
-    .mesh-group h3 { margin: 0 0 5px 0; font-size: 14px; color: #6cf; }
-    .slider-group { margin: 4px 0; }
-    .slider-group label { font-size: 12px; display: block; margin-bottom: 2px; }
+
+    .mesh-group {
+      margin-bottom: 1em;
+    }
+
+    .mesh-group h3 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #6cf;
+    }
+
+    .slider-group {
+      margin: 4px 0;
+    }
+
+    .slider-group label {
+      font-size: 12px;
+      display: block;
+      margin-bottom: 2px;
+    }
   </style>
 </head>
+
 <body>
   <div id="sliderContainer"></div>
   <script type="module">
     import * as THREE from 'https://esm.sh/three@0.160.0';
     import { FBXLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/FBXLoader.js';
+    import { blendshapeNameMap, arkitBlendshapeOrder } from './constants.js'
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -41,48 +75,69 @@
     const morphMeshes = [];
 
     function createSlidersForMesh(mesh) {
-      const container = document.getElementById('sliderContainer');
+      const container = document.getElementById("sliderContainer");
 
-      const groupDiv = document.createElement('div');
-      groupDiv.className = 'mesh-group';
+      const groupDiv = document.createElement("div");
+      groupDiv.className = "mesh-group";
 
-      const title = document.createElement('h3');
-      title.innerText = mesh.name || 'Unnamed Mesh';
+      const title = document.createElement("h3");
+      title.innerText = mesh.name || "Unnamed Mesh";
       groupDiv.appendChild(title);
 
-      const dict = mesh.morphTargetDictionary;
-      const influences = mesh.morphTargetInfluences;
+      const dict = mesh.morphTargetDictionary || {};
+      const influences = mesh.morphTargetInfluences || [];
 
-      Object.entries(dict).forEach(([name, index]) => {
-        const sliderGroup = document.createElement('div');
-        sliderGroup.className = 'slider-group';
+      // Reverse lookup: ARKit name -> modelName
+      const modelNameByArkit = {};
+      for (const [modelName, index] of Object.entries(dict)) {
+        const arkitName = blendshapeNameMap[modelName];
+        if (arkitName) {
+          modelNameByArkit[arkitName] = { modelName, index };
+        }
+      }
 
-        const label = document.createElement('label');
-        label.textContent = name;
+      // Create sliders in fixed order
+      for (let i = 0; i < arkitBlendshapeOrder.length; i++) {
+        const arkitName = arkitBlendshapeOrder[i];
+        const mapping = modelNameByArkit[arkitName];
 
-        const slider = document.createElement('input');
-        slider.type = 'range';
+        const sliderGroup = document.createElement("div");
+        sliderGroup.className = "slider-group";
+
+        const label = document.createElement("label");
+        label.textContent = `${i} ${arkitName}`;
+        sliderGroup.appendChild(label);
+
+        const slider = document.createElement("input");
+        slider.type = "range";
         slider.min = 0;
         slider.max = 1;
         slider.step = 0.01;
-        slider.value = influences[index] || 0;
 
-        slider.oninput = () => {
-          influences[index] = parseFloat(slider.value);
-        };
+        if (mapping) {
+          // Real blendshape
+          slider.value = influences[mapping.index] || 0;
+          slider.oninput = () => {
+            influences[mapping.index] = parseFloat(slider.value);
+          };
+        } else {
+          // Placeholder
+          slider.value = 0;
+          slider.disabled = true;
+        }
 
-        sliderGroup.appendChild(label);
         sliderGroup.appendChild(slider);
         groupDiv.appendChild(sliderGroup);
-      });
+      }
 
       container.appendChild(groupDiv);
     }
 
-    loader.load('./Beautiful 3D Model Head - Kelly.fbx', (fbx) => {
+
+    loader.load('./assets/Ally Face Head Model with hair.fbx', (fbx) => {
       // fbx.scale.set(0.05, 0.05, 0.05);
       fbx.scale.set(4, 4, 4);
-    //   fbx.rotation.y = Math.PI;
+      //   fbx.rotation.y = Math.PI;
       scene.add(fbx);
 
       fbx.traverse((child) => {
@@ -107,4 +162,5 @@
     animate();
   </script>
 </body>
+
 </html>
