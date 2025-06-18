@@ -60,6 +60,7 @@ function loadModel() {
     loader.load('./assets/Ally Face Head Model with hair.fbx', (fbx) => {
         fbx.scale.set(4.4, 4.4, 4.4);
         scene.add(fbx);
+        fbx.rotation.x = 0.1
 
         fbx.traverse((child) => {
             if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
@@ -256,7 +257,6 @@ function applyBlendshapeValues(values) {
     for (let i = 0; i < Math.min(values.length, arkitBlendshapes.length); i++) {
         const value = Math.max(0, Math.min(1, values[i]));
         currentBlendshapeValues[i] = value;
-        console.log(`sliders[i] ${sliders[i]}`)
         if (sliders[i]) {
             sliders[i].slider.value = value;
             sliders[i].valueDisplay.textContent = value.toFixed(2);

@@ -374,3 +374,75 @@ button:hover {
     max-height: 150px;
     overflow-y: auto;
 }
+
+@media screen and (max-width: 768px) {
+    .main-content {
+        display: block;
+        height: auto;
+    }
+
+    .controls-section {
+        margin-top: 20px;
+    }
+
+    .input-section,
+    .stats,
+    .viewer-section,
+    .controls-section {
+        padding: 15px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    textarea {
+        height: 80px;
+        font-size: 14px;
+    }
+
+    .input-header h3 {
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .model-controls h4,
+    .blendshapes-panel h3 {
+        font-size: 16px;
+    }
+
+    .control-row label {
+        min-width: 50px;
+        font-size: 12px;
+    }
+
+    .slider-value {
+        font-size: 11px;
+    }
+
+    .stat-item {
+        margin: 10px 10px;
+        display: inline-block;
+    }
+
+    .attribution {
+        position: static;
+        margin-top: 10px;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    #threejs-container {
+        height: 300px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+        font-size: 14px;
+    }
+}
