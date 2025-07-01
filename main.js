@@ -1,12 +1,15 @@
 import { ThreeScene } from './threeScene.js';
-import { SliderManager, ModalManager } from './uiComponents.js';
+import { SliderManager, ModalManager, AudioUploadManager } from './uiComponents.js';
 import { BlendshapeProcessor } from './blendshapeProcessor.js';
+import { AudioProcessor } from './audioProcessor.js';
 
 
 let threeScene;
 let sliderManager;
 let blendshapeProcessor;
 let modalManager;
+let audioProcessor;
+let audioUploadManager;
 
 function initThreeJS() {
     threeScene = new ThreeScene();
@@ -22,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sliderManager = new SliderManager();
     blendshapeProcessor = new BlendshapeProcessor(sliderManager);
     modalManager = new ModalManager();
+    audioProcessor = new AudioProcessor(sliderManager);
+    audioUploadManager = new AudioUploadManager(audioProcessor);
     
     initThreeJS();
     threeScene.setupModelControls();
