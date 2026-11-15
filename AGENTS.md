@@ -2,7 +2,7 @@
 
 ## Project context
 
-This repository is a small static browser app for applying ARKit facial blendshape values to a Three.js FBX head model. Read `README.md` for setup, user behavior, and current limitations. In particular, audio upload currently creates synthetic animation frames; there is no inference API.
+This repository is a small static browser app for applying facial blendshape values to the included Three.js FBX head model or uploaded GLB, glTF, and FBX models. Read `README.md` for setup, user behavior, and current limitations. In particular, audio upload currently creates synthetic animation frames; there is no inference API.
 
 The canonical repository is [aawgit/blendshape-viewer](https://github.com/aawgit/blendshape-viewer). Its `main` branch contains this ARKit blendshape viewer.
 
@@ -16,4 +16,4 @@ The canonical repository is [aawgit/blendshape-viewer](https://github.com/aawgit
 
 ## Validation
 
-For code changes, serve the repository root with `python3 -m http.server 8000` and check the app in a WebGL-capable browser. Verify the relevant UI interaction and check the browser console for errors. There is currently no automated test or build command.
+For code changes, serve the repository root with `python3 -m http.server 8000` and check the app in a WebGL-capable browser. Verify the relevant UI interaction, including model uploads when affected, and check the browser console for errors. There is currently no automated test or build command.
