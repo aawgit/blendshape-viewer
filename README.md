@@ -4,6 +4,8 @@ A browser-based tool for previewing ARKit facial blendshape coefficients on a 3D
 
 **Live demo:** <https://akalanka.dev/blendshape-visualizer>
 
+**Source repository:** <https://github.com/aawgit/blendshape-viewer>
+
 The app also has an audio upload and playback UI. **Audio-to-blendshape generation is currently a placeholder**: uploaded audio is played while synthetic blendshape frames are generated locally. It does not call an inference service or derive facial animation from the audio.
 
 ## Run locally
