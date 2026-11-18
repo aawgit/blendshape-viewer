@@ -14,17 +14,13 @@
                 <div class="input-header">
                     <h3>Upload 3D Model:</h3>
                 </div>
-                <label for="modelFileInput">Choose a GLB, glTF, or FBX model with blendshapes and any separate textures or buffers:</label>
-                <input type="file" id="modelFileInput" accept=".glb,.gltf,.fbx,.bin,.png,.jpg,.jpeg,.webp" multiple disabled>
+                <p id="modelUploadHelp">Select a GLB, glTF, or FBX model and any separate textures or buffers.</p>
+                <input type="file" id="modelFileInput" class="model-file-input" accept=".glb,.gltf,.fbx,.bin,.png,.jpg,.jpeg,.webp" aria-describedby="modelUploadHelp" multiple>
+                <label for="modelFileInput" class="model-upload-button">Choose Model Files</label>
                 <div id="modelStatus" class="upload-status" role="status" aria-live="polite"></div>
-                <div class="input-header">
-                    <h3>Upload Audio File:</h3>
-                </div>
-                <div id="audioUploadContainer"></div>
-                <div id="audioControlsContainer"></div>
                 
                 <div class="input-header" style="margin-top: 2rem;">
-                    <h3>Or paste your blendshapes array:</h3>
+                    <h3>Paste a blendshape array (optional):</h3>
                     <button class="info-button" onclick="showInfoModal()" title="Show coefficient order">?</button>
                 </div>
                 <textarea id="inputData" placeholder="[0.0, 0.0, 0.0, ...]"></textarea>

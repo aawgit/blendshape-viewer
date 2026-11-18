@@ -6,34 +6,6 @@ body {
     padding: 20px;
 }
 
-/* Audio Upload Styles */
-.audio-upload-section {
-    margin-bottom: 20px;
-}
-
-.upload-area {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.upload-btn {
-    background: #00ff88;
-    color: #1a1a1a;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-    align-self: flex-start;
-}
-
-.upload-btn:hover {
-    background: #00cc6a;
-}
-
 .upload-status {
     padding: 10px;
     border-radius: 6px;
@@ -54,85 +26,6 @@ body {
 .upload-status.error {
     background: #4a0000;
     color: #ff8888;
-}
-
-/* Audio Controls Styles */
-.audio-controls-section {
-    margin: 20px 0;
-}
-
-.audio-controls {
-    background: #333;
-    padding: 20px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.control-btn {
-    background: #555;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-    margin-right: 10px;
-}
-
-.control-btn:hover {
-    background: #666;
-}
-
-.control-btn:active {
-    background: #00ff88;
-    color: #1a1a1a;
-}
-
-.progress-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.progress-bar {
-    flex: 1;
-    height: 8px;
-    background: #555;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: #00ff88;
-    width: 0%;
-    transition: width 0.1s ease-out;
-}
-
-.time-display {
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    color: #ccc;
-    min-width: 100px;
-}
-
-.animation-info {
-    background: #2a2a2a;
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #ccc;
-}
-
-.animation-info div {
-    margin-bottom: 5px;
-}
-
-.animation-info div:last-child {
-    margin-bottom: 0;
 }
 
 .container {
@@ -198,7 +91,8 @@ textarea {
     box-sizing: border-box;
 }
 
-button {
+button,
+.model-upload-button {
     background: #00ff88;
     color: black;
     border: none;
@@ -209,8 +103,26 @@ button {
     margin-top: 10px;
 }
 
-button:hover {
+button:hover,
+.model-upload-button:hover {
     background: #00cc6a;
+}
+
+.model-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.model-upload-button {
+    display: inline-block;
+    font: bold 13.3333px Arial, sans-serif;
+}
+
+.model-file-input:focus-visible + .model-upload-button {
+    outline: 2px solid white;
+    outline-offset: 2px;
 }
 
 .stats {
