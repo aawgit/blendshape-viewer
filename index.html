@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blendshape Parser & Visualizer | ARKit Blendshapes</title>
+    <title>Blendshape Viewer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
         <div class="container">
-            <h1>Blendshape Parser & Visualizer </h1>
+            <h1>Blendshape Viewer</h1>
             
             <div class="input-section">
                 <div class="input-header">
@@ -18,28 +18,6 @@
                 <input type="file" id="modelFileInput" class="model-file-input" accept=".glb,.gltf,.fbx,.bin,.png,.jpg,.jpeg,.webp" aria-describedby="modelUploadHelp" multiple>
                 <label for="modelFileInput" class="model-upload-button">Choose Model Files</label>
                 <div id="modelStatus" class="upload-status" role="status" aria-live="polite"></div>
-                
-                <div class="input-header" style="margin-top: 2rem;">
-                    <h3>Paste a blendshape array (optional):</h3>
-                    <button class="info-button" onclick="showInfoModal()" title="Show coefficient order">?</button>
-                </div>
-                <textarea id="inputData" placeholder="[0.0, 0.0, 0.0, ...]"></textarea>
-                <button onclick="parseData()">Parse & Apply Blendshapes</button>
-            </div>
-            
-            <div id="stats" class="stats" style="display: none;">
-                <div class="stat-item">
-                    <div class="stat-value" id="totalValues">0</div>
-                    <div class="stat-label">Total Values</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="activeCount">0</div>
-                    <div class="stat-label">Active Blendshapes</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="maxValue">0</div>
-                    <div class="stat-label">Max Value</div>
-                </div>
             </div>
             
             <div class="main-content">
@@ -61,40 +39,29 @@
                             <label>Rotation:</label>
                             <input type="range" id="modelRotation" min="0" max="6.28" step="0.1" value="0" />
                         </div>
+                        <div class="control-row">
+                            <label for="modelHorizontalOffset">Horizontal framing:</label>
+                            <input type="range" id="modelHorizontalOffset" min="-1.5" max="1.5" step="0.01" value="0" />
+                        </div>
+                        <div class="control-row">
+                            <label for="modelVerticalOffset">Vertical framing:</label>
+                            <input type="range" id="modelVerticalOffset" min="-1.5" max="1.5" step="0.01" value="0" />
+                        </div>
                     </div>
                     
                     <div class="blendshapes-panel">
                         <h3>ARKit Blendshapes</h3>
+                        <details class="blendshape-help">
+                            <summary>About blendshapes</summary>
+                            <p>Blendshapes are built-in changes to a model's shape, often used for facial expressions but also for bodies and other objects. Move a slider to blend in a change; bone animation is separate.</p>
+                            <p>There is no universal naming convention: models may use ARKit, FACS, speech shapes (visemes), or custom names. Recognized ARKit targets appear in the ARKit section; other targets appear under Other model blendshapes. Disabled sliders have no matching target. Models without blendshapes cannot be controlled this way.</p>
+                        </details>
                         <div id="sliderContainer"></div>
                     </div>
                 </div>
             </div>
         </div>
-    
-        <!-- Info Modal -->
-        <div id="infoModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeInfoModal()">&times;</span>
-                <h2>ARKit Blendshape Coefficient Order</h2>
-                <p>The input array should contain 52 values in the following order:</p>
-                
-                <div class="blendshape-list" id="blendshapeOrderList"></div>
-                
-                <h3>Example Array Format:</h3>
-                <div class="example-array" id="exampleArray"></div>
-                
-                <p><strong>Notes:</strong></p>
-                <ul>
-                    <li>Values should be between 0.0 and 1.0</li>
-                    <li>Array can be in JSON format: <code>[0.1, 0.2, ...]</code></li>
-                    <li>Values greater than 0.01 will be considered "active"</li>
-                    <li>The viewer will automatically parse and apply the blendshapes</li>
-                    <li>ARKit blendshapes not supported by the loaded model are shown as disabled sliders.</li>
-                </ul>
-            </div>
-        </div>
-    
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="./main.js?v=framing-controls"></script>
 
    
 </body>

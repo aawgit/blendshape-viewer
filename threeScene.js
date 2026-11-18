@@ -138,6 +138,9 @@ export class ThreeScene {
         this.scene.add(model);
         document.getElementById('modelScale').value = sliderScale;
         document.getElementById('modelRotation').value = 0;
+        document.getElementById('modelHorizontalOffset').value = 0;
+        document.getElementById('modelVerticalOffset').value = 0;
+        this.updateModelFraming();
         return meshes;
     }
 
@@ -178,6 +181,8 @@ export class ThreeScene {
     setupModelControls() {
         const scaleSlider = document.getElementById('modelScale');
         const rotationSlider = document.getElementById('modelRotation');
+        const horizontalOffsetSlider = document.getElementById('modelHorizontalOffset');
+        const verticalOffsetSlider = document.getElementById('modelVerticalOffset');
 
         if (scaleSlider) {
             scaleSlider.oninput = () => {
@@ -192,6 +197,16 @@ export class ThreeScene {
                 if (this.model) this.model.rotation.y = rotation;
             };
         }
+
+        [horizontalOffsetSlider, verticalOffsetSlider].forEach(slider => {
+            if (slider) slider.oninput = () => this.updateModelFraming();
+        });
+    }
+
+    updateModelFraming() {
+        if (!this.model) return;
+        this.model.position.x = Number(document.getElementById('modelHorizontalOffset').value);
+        this.model.position.y = Number(document.getElementById('modelVerticalOffset').value);
     }
 
 }

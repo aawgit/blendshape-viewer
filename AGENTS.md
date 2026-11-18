@@ -9,7 +9,7 @@ The canonical repository is [aawgit/blendshape-viewer](https://github.com/aawgit
 ## Working conventions
 
 - Keep the app dependency-light and compatible with the existing browser-native ES modules. There is no package manager, bundler, or test framework configured.
-- Keep the ARKit coefficient ordering in `constants.js` consistent with the help dialog, example input, and slider index mapping.
+- Keep the ARKit names and mappings in `constants.js` consistent with the slider UI.
 - Preserve the included model's attribution in `index.html`.
 - Avoid adding dependencies or changing the project's architecture for a narrow fix.
 - Update `README.md` when user-facing behavior, setup, or limitations change.
