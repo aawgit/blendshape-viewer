@@ -2,7 +2,7 @@ model# ARKit Blendshape Viewer
 
 A browser-based tool for previewing blendshapes on the included Ally head model or an uploaded 3D model. Adjust individual sliders to explore each shape.
 
-**Live demo:** <https://akalanka.dev/blendshape-visualizer>
+**GitHub Pages site (after deployment):** <https://blendshapes.akalanka.dev>
 
 **Source repository:** <https://github.com/aawgit/blendshape-viewer>
 
@@ -40,3 +40,9 @@ The [test-models](./test-models/) folder contains Rocketbox busts and larger sam
 ## Development
 
 There is no package manifest, build script, or automated test suite. For a basic local smoke check, serve the repository as above and confirm the default model loads, upload a model with blendshapes, and adjust its sliders. Browser developer tools are useful for diagnosing module, network, or WebGL errors.
+
+## Deployment
+
+The GitHub Actions Pages workflow publishes on pushes to `main` and can also be started manually from that branch. It publishes only the app files and the default Ally model and image; `test-models/` and other repository files are not included. Sample models can still be uploaded from a local checkout.
+
+In the repository's **Settings > Pages**, select **GitHub Actions** as the source and set the custom domain to `blendshapes.akalanka.dev` before adding the DNS record. At the DNS provider, create a CNAME for `blendshapes` pointing to `aawgit.github.io` (without a repository path). After DNS and certificate provisioning complete, enable **Enforce HTTPS** in Pages settings. GitHub recommends [verifying the domain](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages) to reduce takeover risk.
